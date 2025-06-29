@@ -1,5 +1,7 @@
 import numpy as np
 from sklearn import neighbors as nb
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import StandardScaler
 import pickle
 from sklearn.model_selection import GridSearchCV
 from data_generation import get_data
@@ -40,7 +42,11 @@ opt_params_knn_N = {}
     
 for j in range(n_trial):
     y_data, d_data, x_data = get_data(N, rng)
-    opt_params_knn_N[j] = knn_cv(y_data, d_data, x_data)
+    poly_features = PolynomialFeatures(degree=2, include_bias=False)
+    x_data_quad = poly_features.fit_transform(x_data)
+    scaler_x = StandardScaler()
+    x_data_scaled = scaler_x.fit_transform(x_data_quad)
+    opt_params_knn_N[j] = knn_cv(y_data, d_data, x_data_scaled)
 
 for i in range(n_trial):
     

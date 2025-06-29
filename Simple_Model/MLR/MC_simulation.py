@@ -1,8 +1,8 @@
 import numpy as np
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.preprocessing import PolynomialFeatures
 import pickle
 from data_generation import get_data
-from mlr import mlr
+from MLR import mlr
 
 def mc_simulation(N=10000, n_MC=10):
     

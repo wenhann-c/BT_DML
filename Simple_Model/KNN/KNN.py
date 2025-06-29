@@ -5,12 +5,11 @@ from scipy.stats import norm
 from sklearn.preprocessing import StandardScaler
 from sklearn.base import clone
 
-def dml(y_data, d_data, x_data, model_l, model_m, K=5, alpha=0.05):
+def knn(y_data, d_data, x_data, model_l, model_m, K=5, alpha=0.05):
 
     kf = KFold(n_splits=K, shuffle=True)
     
     b_check_list = []
-    scores_list = []
     mse_list = []
     
     for (train_indices, test_indices) in kf.split(X=x_data, y=y_data):
@@ -36,24 +35,18 @@ def dml(y_data, d_data, x_data, model_l, model_m, K=5, alpha=0.05):
         d_resid = d_test - m_hat
         d_resid = d_resid.reshape(-1,1)
 
-        score_a = np.multiply(d_resid, d_resid)
-        score_b = np.multiply(d_resid, y_resid)
-        coef = np.mean(score_b) / np.mean(score_a)
+        coef = np.mean(np.multiply(d_resid, y_resid)) / np.mean(np.multiply(d_resid, d_resid))
         b_check_list.append(coef)
-
-        psi = score_b - coef * score_a
-        scores_list.append(psi)
 
         mse_l = mean_squared_error(y_test,l_hat)
         mse_m = mean_squared_error(d_test,m_hat)
         mse_list.append([mse_l,mse_m])
 
     b_hat = np.mean(b_check_list)
-    scores = np.concatenate(scores_list)
-    sigma2_hat = np.mean(scores**2)
+    sigma_hat = np.std(b_check_list, ddof=1)
     N = len(y_data)
     quantile = norm.ppf(1 - alpha/2)
-    se_hat = np.sqrt(sigma2_hat/N)
+    se_hat = sigma_hat/np.sqrt(N)
     CI = np.array([b_hat - quantile*se_hat, b_hat + quantile*se_hat])
 
     mse = np.mean(mse_list, axis=0)

@@ -1,8 +1,9 @@
 import numpy as np
 from sklearn import neighbors as nb
+from sklearn.preprocessing import PolynomialFeatures
 import pickle
 from data_generation import get_data
-from dml_algorithm import dml
+from KNN import knn
 
 with open('opt_params_knn.pkl', 'rb') as pickle_file:
     opt_params_knn = pickle.load(pickle_file)
@@ -27,8 +28,10 @@ def mc_simulation(N=10000, n_MC=10):
 
     for j in range(n_MC):
         y_data, d_data, x_data = get_data(N, rng)
+        poly_features = PolynomialFeatures(degree=2, include_bias=False)
+        x_data_quad = poly_features.fit_transform(x_data)
         model_l, model_m = get_models(opt_params_knn)
-        ate_estimates[j, 0], se_estimates[j,0], CIs[j, :], mses[j, :] = dml(y_data, d_data, x_data, model_l, model_m)
+        ate_estimates[j, 0], se_estimates[j,0], CIs[j, :], mses[j, :] = knn(y_data, d_data, x_data_quad, model_l, model_m)
         
         results_dict = {
         'ate_estimates': ate_estimates,
