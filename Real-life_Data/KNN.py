@@ -111,7 +111,7 @@ def knn(y_data, d_data, x_data, model_treat, model_control, B=100, alpha=0.05):
     se_hat = np.std(ate_bootstrap, ddof=1)
     lower = np.percentile(ate_bootstrap, 100 * alpha / 2)
     upper = np.percentile(ate_bootstrap, 100 * (1 - alpha / 2))
-    CI = np.array([lower, upper])
+    CI = np.array([2 * ate_hat - upper , 2 * ate_hat - lower])
 
     results_dict = {
     'ate_estimate': ate_hat,
